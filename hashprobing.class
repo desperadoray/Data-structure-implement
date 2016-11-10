@@ -1,0 +1,235 @@
+package csci225;
+// File:        MyHashTable.java
+
+// Author:      Geoffrey Tien
+//              (your name here)
+// Date:        November 09, 2016
+// Description: Hash table class for CSCI 225 lab 6
+
+public class MyHashTable {
+
+	// constants
+	private static final int EMPTY = -1; // reserved, do not hash -1
+
+	// member attributes
+	private int[] table; // array of (integer) keys
+	private int capacity; // array size
+	private int count; // number of stored keys
+	// private double maxloadfactor; // load factor threshold before table grows
+	private int quaprobcount;
+	// diagnostics
+	private int totalprobes;
+	private int numinserts;
+	private int numfailures;
+
+	// private methods
+	// Add the number of probes, p, for one insert operation to the tally
+	private void TallyProbes(int p) {
+		totalprobes += p;
+		numinserts += 1;
+	}
+
+	// Return the next prime number larger than n
+	// If n is less than 100, return next prime larger than 100
+	private int NextPrime(int n) {
+		int result = n;
+		if (result < 100)
+			result = 100;
+		while (!IsPrime(result)) {
+			result += 1;
+		}
+		return result;
+	}
+
+	private boolean IsPrime(int n) {
+		if (n < 2)
+			return false;
+		if (n == 2)
+			return true;
+		if (n % 2 == 0)
+			return false;
+		return IsPrime(n, 3);
+	}
+
+	private boolean IsPrime(int n, int divisor) {
+		if ((divisor * divisor) > n)
+			return true;
+		if ((n % divisor) == 0)
+			return false;
+		return IsPrime(n, divisor + 2);
+	}
+
+	// public methods
+
+	// constructor
+	// make a Hash table with capacity at least size
+	public MyHashTable(int size) {
+		int someprime = NextPrime(size);
+		capacity = size;
+		if (someprime != size) {
+			System.out.println("Warning: capacity = " + size + " is not a prime number.");
+			// The following lines may be uncommented
+			System.out.println("Using " + someprime + " instead.");
+			capacity = someprime;
+		}
+		table = new int[capacity];
+		count = 0;
+		for (int i = 0; i < capacity; i++) {
+			table[i] = EMPTY;
+		}
+		totalprobes = 0;
+		numinserts = 0;
+		numfailures = 0;
+	}
+
+	// clears / initializes the hash table
+	public void Clear() {
+		count = 0;
+		for (int i = 0; i < capacity; i++) {
+			table[i] = EMPTY;
+		}
+		totalprobes = 0;
+		numinserts = 0;
+		numfailures = 0;
+	}
+
+	public String PrintStats() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Average probes/insert = ");
+		sb.append(ProbeRate() + " = ");
+		sb.append(totalprobes + "/" + numinserts);
+		sb.append(", capacity = " + capacity);
+		sb.append(", failures = " + numfailures + "\n");
+		return sb.toString();
+	}
+
+	public double ProbeRate() {
+		return (double) totalprobes / (double) numinserts;
+	}
+
+	public int Hash(int k) {
+		// this is not a very good hash function - similar key values
+		// will be mapped to similar array indices
+		return k % capacity;
+	}
+
+	// Insert k into the hash table.
+	// Use open addressing with linear probing and Hash(k) = k % capacity
+	public void LInsert(int k) {
+		// ************* ADD YOUR CODE HERE *******************
+		int i = Hash(k);
+		int lprobe = 0;
+		if(table[i] == EMPTY){
+			table[i] = k;
+			TallyProbes(lprobe);
+			count++;
+			return;
+		}
+		
+		else{
+			i++;
+			lprobe++;
+			while(i < capacity){
+				if(table[i] != EMPTY){
+					i++;
+					lprobe++;
+				}
+				else{
+					TallyProbes(lprobe);
+					count++;
+					return;
+				}
+			}
+			i = 0;
+			while(i < capacity){
+				if(table[i] != EMPTY){
+					i++;
+					lprobe++;
+				}
+				else{
+					TallyProbes(lprobe);
+					count++;
+					return;
+				}
+			}
+		}
+		
+		// Your method should return after it stores the value in an EMPTY slot
+		// and calls tallyProbes, so if it gets here, it didn't find an EMPTY
+		// slot
+		numfailures += 1;
+		System.out.println("Warning: LInsert(" + k + ") found no EMPTY slot, insert failed.");
+	}
+
+	// Insert k into the hash table.
+	// Use open addressing with quadratic probing and Hash(k) = k % capacity
+	public void QInsert(int k) {
+		// Tips:
+		// - Look at the lecture slides if you don't remember how to implement
+		// these.
+		// - You need to prevent against infinite loops. You should limit the
+		// number
+		// of times you probe and print an error message upon exceeding this
+		// limit.
+		// - You are welcome to add new declarations to the private attributes,
+		// add to the constructor, include libraries, or anything else you need.
+		// - You are also welcome to modify the main() method to automate your
+		// testing.
+
+		// ************* ADD YOUR CODE HERE *******************
+		int qprobe = 0;
+		int j;
+		int i = Hash(k);
+		if(table[i] == EMPTY){
+			table[i] = k;
+			TallyProbes(qprobe);
+			return;
+		}
+		else{
+			qprobe++;
+			j = (i + 1) % capacity;
+			while(qprobe < capacity){
+					if(table[j] == EMPTY){
+						table[j] = k;
+						TallyProbes(qprobe);
+						return;
+					}
+					j = (i + ++qprobe * qprobe) % capacity;
+				}
+			}
+		
+		// Your method should return after it stores the value in an EMPTY slot
+		// and calls tallyProbes, so if it gets here, it didn't find an EMPTY
+		// slot
+		numfailures += 1;
+		System.out.println("Warning: QInsert(" + k + ") found no EMPTY slot, insert failed.");
+	}
+
+	// Insert k in the hash table.
+	// Use open addressing with double hashing. Use the existing hash function
+	// and also implement a second hash function of your own design.
+	public void DInsert(int k) {
+		// ************* ADD YOUR CODE HERE *******************
+
+		// Your method should return after it stores the value in an EMPTY slot
+		// and calls tallyProbes, so if it gets here, it didn't find an EMPTY
+		// slot
+		numfailures += 1;
+		System.out.println("Warning: DInsert(" + k + ") found no EMPTY slot, insert failed.");
+	}
+
+	// Print the contents of the hash table
+	public void Print() {
+		for (int i = 0; i < capacity; i++) {
+			System.out.print("[" + i + "] ");
+			if (table[i] != EMPTY)
+				System.out.print("table[i]");
+			System.out.print("\n");
+		}
+	}
+
+	// Check if the value k is at index i. Use this to help you with testing
+	public boolean CheckValue(int k, int i) {
+		return table[i] == k;
+	}
+}
