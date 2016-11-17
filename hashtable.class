@@ -118,36 +118,20 @@ public class MyHashTable {
 	public void LInsert(int k) {
 		// ************* ADD YOUR CODE HERE *******************
 		int i = Hash(k);
-		int lprobe = 0;
+		int j = 0;
 		if(table[i] == EMPTY){
 			table[i] = k;
-			TallyProbes(lprobe);
+			TallyProbes(j);
 			count++;
 			return;
 		}
-		
 		else{
-			i++;
-			lprobe++;
-			while(i < capacity){
-				if(table[i] != EMPTY){
-					i++;
-					lprobe++;
-				}
-				else{
-					TallyProbes(lprobe);
-					count++;
-					return;
-				}
-			}
-			i = 0;
-			while(i < capacity){
-				if(table[i] != EMPTY){
-					i++;
-					lprobe++;
-				}
-				else{
-					TallyProbes(lprobe);
+			while(j <= capacity){
+				j++;
+				i = (i+j*j) % capacity;
+				if(table[i] == EMPTY){
+					table[i] = k;
+					TallyProbes(j);
 					count++;
 					return;
 				}
