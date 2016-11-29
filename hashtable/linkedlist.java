@@ -66,18 +66,18 @@ public class A4LinkedList {
 	// Return true if the list contains item, false otherwise
 	public boolean Contains(Comparable item) {
 		// to be completed
-		if(front == null)
+		if (front == null)
 			return false;
-		else{
+		else {
 			A4ListNode nd = front;
-			while(nd.next!=null){
-				if(nd.data.compareTo(item) == 0)
+			while (nd.next != null) {
+				if (nd.data.compareTo(item) == 0)
 					return true;
 				nd = nd.next;
 			}
-			if(nd.data.compareTo(item) == 0)
+			if (nd.data.compareTo(item) == 0)
 				return true;
-				
+
 		}
 		return false;
 	}
@@ -87,14 +87,14 @@ public class A4LinkedList {
 	// elements in the list
 	public Comparable[] ToArray() {
 		// to be completed
-		if(front == null)
+		if (front == null)
 			return null;
-		else{
-			Comparable [] arr = new Comparable[size];
+		else {
+			Comparable[] arr = new Comparable[size];
 			A4ListNode nd = front;
-			for(int i = 0; i < size; i++){
+			for (int i = 0; i < size; i++) {
 				arr[i] = nd.data;
-				if(nd.next!= null)
+				if (nd.next != null)
 					nd = nd.next;
 			}
 			return arr;
@@ -106,9 +106,9 @@ public class A4LinkedList {
 	// Insert an item at the front of the list
 	public void InsertFront(Comparable item) {
 		// to be completed
-		if(front == null)
+		if (front == null)
 			front = new A4ListNode(item);
-		else{
+		else {
 			A4ListNode nd = front;
 			A4ListNode adnd = new A4ListNode(item);
 			adnd.next = nd;
@@ -124,24 +124,22 @@ public class A4LinkedList {
 	// likewise for inserting at the back of a non-empty list
 	public void InsertAt(Comparable item, int index) {
 		// to be completed
-		if(index < 0 || index > size)
+		if (index < 0 || index > size)
 			return;
-		else if(index == 0){
+		else if (index == 0) {
 			this.InsertFront(item);
 			return;
-		}
-		else if(front == null)
+		} else if (front == null)
 			front = new A4ListNode(item);
-		else if(index == size){
+		else if (index == size) {
 			A4ListNode nd = front;
-			for(int i = 1; i < index; i++){
+			for (int i = 1; i < index; i++) {
 				nd = nd.next;
 			}
 			nd.next = new A4ListNode(item);
-		}
-		else{
+		} else {
 			A4ListNode nd = front;
-			for(int i = 1; i < index; i++){
+			for (int i = 1; i < index; i++) {
 				nd = nd.next;
 			}
 			A4ListNode tmp = nd.next;
@@ -156,15 +154,40 @@ public class A4LinkedList {
 	// List is unchanged and return false if item is not found
 	public boolean Remove(Comparable item) {
 		// to be completed
+		if (!Contains(item))
+			return false;
+		else {
+			A4ListNode nd = front;
+			if (nd.data.compareTo(item) == 0) {
+				front = nd.next;
+				size--;
+				return true;
+			} else {
+				for (int i = 1; i < size; i++) {
+					if (nd.next.data.compareTo(item) == 0) {
+						if (nd.next.next == null) {
+							nd.next = null;
+							size--;
+							return true;
+						} else {
+							nd.next = nd.next.next;
+							size--;
+							return true;
+						}
+					} else
+						nd = nd.next;
+				}
+			}
+		}
 		return false;
 	}
-	
-	public void printlist(){
+
+	public void printlist() {
 		A4ListNode nd = front;
-		if(nd == null)
+		if (nd == null)
 			System.out.println("Empty list");
-		else{
-			while(nd.next!=null){
+		else {
+			while (nd.next != null) {
 				System.out.println(nd.data);
 				nd = nd.next;
 			}
